@@ -74,7 +74,7 @@ static uint8_t vcom = 0;
 /* FIXME: removed hardcoded buffer length */
 static uint8_t buff[12482];
 
-#define PIN_SCS 8
+#define PIN_SCS 24
 #define PIN_DISP 25
 
 /* FIXME: initialize with screen width and height */
