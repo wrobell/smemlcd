@@ -31,7 +31,7 @@ class SMemLCD(object):
         """
         Create Sharp Memory LCD display instance.
         """
-        self._lib = ct.CDLL('libmemlcd.so.0')
+        self._lib = ct.CDLL('libsmemlcd.so.0')
         self._lib.smemlcd_init()
 
 
