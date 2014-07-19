@@ -44,8 +44,8 @@ class SMemLCD(object):
         n = len(data)
         assert n == 12000
 
-        buff = (ct.c_ubyte * n).from_buffer_copy(painter.data)
-        self._lib.memlcd_write(buff)
+        buff = (ct.c_ubyte * n).from_buffer_copy(data)
+        self._lib.smemlcd_write(buff)
 
 
 # vim: sw=4:et:ai
