@@ -1,0 +1,35 @@
+Introduction
+============
+The smemlcd library provides C library (with Python 3 bindings) for Sharp
+Memory LCDs
+
+    http://www.sharpmemorylcd.com/
+
+At the moment only 2.7" LCD screen (LS027B7DH01) is supported.
+
+The screen was tested with Raspberry Pi and Kuzyatech Sharp Memory LCD
+breakout A2
+
+    https://www.tindie.com/products/kuzyatech/sharp-memory-lcd-breakout-a2/
+
+Connecting 2.7" LCD
+===================
+The LCD should be connected to Raspberry Pi using the following connection
+scheme::
+
+    Breakout            Raspberry Pi
+    --------------------------------
+    VIN                 3V3 Power
+    GND                 Ground
+    DISP                GPIO 25
+    SCS                 GPIO 24
+    SI                  GPIO 10 (MOSI)
+    SCLK                GPIO 11 (SCLK)
+
+Using Library
+=============
+The library is very basic and does not provide any drawing primitives.
+Additional library like PIL or Cairo should be used to create framebuffer,
+draw in the frawebuffer and finally send the framebuffer to the LCD.
+
+See `examples` directory for various examples.
