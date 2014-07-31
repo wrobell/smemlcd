@@ -71,7 +71,7 @@ const uint8_t BIT_REVERSE[256] = {
 
 static int spi_fd;
 static uint8_t vcom = 0;
-/* FIXME: removed hardcoded buffer length */
+/* FIXME: remove hardcoded buffer length */
 static uint8_t buff[12482];
 
 #define PIN_SCS 24
@@ -112,31 +112,34 @@ int smemlcd_write(uint8_t *data) {
     int line;
     int row;
 
-
     /*
      * FIXME: remove all width/height/"buffer length" related hardcodings
      */
 
+    vcom ^= 0b01000000;
+    buff[0] = 0x80 | vcom;
+    for (line = 0; line < 240; line++) {
+        row = line * 52 + 1;
+        buff[row] = BIT_REVERSE[line + 1];
+        for (i = 0; i < 50; i++)
+            buff[row + i + 1] = ~data[line * 50 + i]; // pil
+    }
+
     digitalWrite(PIN_SCS, HIGH);
     usleep(10);
-
-    vcom ^= 0b01000000;
-    r = write(spi_fd, (char[]){0x80 | vcom}, 1);
-    if (r != 1)
+    /* cannot write whole buffer at once due to 4096 bytes limit */
+    /* FIXME: remove hardcodings */
+    r = write(spi_fd, buff, 3120);
+    if (r != 3120)
         perror(NULL);
-
-    for (line = 0; line < 240; line++) {
-        buff[0] = BIT_REVERSE[line + 1];
-        for (i = 0; i < 50; i++)
-            buff[i + 1] = ~data[line * 50 + i];
-
-        r = write(spi_fd, buff, 52);
-        if (r != 52)
-            perror(NULL);
-
-    }
-    r = write(spi_fd, (char[]){0x00}, 1);
-    if (r != 1)
+    r = write(spi_fd, buff + 3120, 3120);
+    if (r != 3120)
+        perror(NULL);
+    r = write(spi_fd, buff + 3120 * 2, 3120);
+    if (r != 3120)
+        perror(NULL);
+    r = write(spi_fd, buff + 3120 * 3, 3122);
+    if (r != 3122)
         perror(NULL);
     usleep(5);
     digitalWrite(PIN_SCS, LOW);
