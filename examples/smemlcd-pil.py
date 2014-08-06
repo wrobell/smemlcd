@@ -47,7 +47,10 @@ for i in range(60, -1, -1):
     draw.arc(((180, 180), (220, 220)), 0, 360, fill='white')
     draw.pieslice(((180, 180), (220, 220)), -90, (60 - i) * 6 - 90, outline='white')
 
+    t1 = time.time()
     lcd.write(img.tobytes())
+    print('lcd writing time', round(time.time() - t1, 4))
+
     time.sleep(1)
 
 # vim: sw=4:et:ai
