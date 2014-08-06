@@ -24,7 +24,7 @@
 
 #include <linux/spi/spidev.h>
 
-#include <wiringPi.h>
+#include "rpi-gpio.c"
 
 #ifdef SMEMLCD_DEBUG
 #include <stdio.h>
@@ -94,15 +94,16 @@ int smemlcd_init() {
     r = ioctl(spi_fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed_hz);
     memset(buff, 0, 12482);
 
-    /* FIXME: remove wiringPi dependency */
-    wiringPiSetupGpio();
-    pinMode(PIN_SCS, OUTPUT);
-    pinMode(PIN_DISP, OUTPUT);
+    gpio_init();
+    GPIO_IN(PIN_SCS);
+    GPIO_OUT(PIN_SCS);
+    GPIO_IN(PIN_DISP);
+    GPIO_OUT(PIN_DISP);
 
-    digitalWrite(PIN_SCS, LOW);
-    digitalWrite(PIN_DISP, LOW);
+    GPIO_CLR(PIN_SCS);
+    GPIO_CLR(PIN_DISP);
     usleep(50);
-    digitalWrite(PIN_DISP, HIGH);
+    GPIO_SET(PIN_DISP);
     usleep(50);
 
 }
@@ -125,7 +126,7 @@ int smemlcd_write(uint8_t *data) {
             buff[row + i + 1] = ~data[line * 50 + i]; // pil
     }
 
-    digitalWrite(PIN_SCS, HIGH);
+    GPIO_SET(PIN_SCS);
     usleep(10);
     /* cannot write whole buffer at once due to 4096 bytes limit */
     /* FIXME: remove hardcodings */
@@ -142,7 +143,7 @@ int smemlcd_write(uint8_t *data) {
     if (r != 3122)
         perror(NULL);
     usleep(5);
-    digitalWrite(PIN_SCS, LOW);
+    GPIO_CLR(PIN_SCS);
 
     return 0;
 }
@@ -153,13 +154,13 @@ int smemlcd_clear() {
 
     vcom ^= 0b01000000;
 
-    digitalWrite(PIN_SCS, HIGH);
+    GPIO_SET(PIN_SCS);
     usleep(10);
 
     r = write(spi_fd, (char[]){0x20 | vcom, 0x00}, 2);
 
     usleep(5);
-    digitalWrite(PIN_SCS, LOW);
+    GPIO_CLR(PIN_SCS);
 
     return 0;
 }
