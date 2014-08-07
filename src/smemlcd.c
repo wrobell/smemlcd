@@ -33,6 +33,11 @@
 #define DEBUG_LOG(fmt, ...)
 #endif
 
+#define BUFF_SIZE 12482
+
+#define PIN_SCS 24
+#define PIN_DISP 25
+
 const uint8_t BIT_REVERSE[256] = {
     0x00, 0x80, 0x40, 0xc0, 0x20, 0xa0, 0x60, 0xe0,
     0x10, 0x90, 0x50, 0xd0, 0x30, 0xb0, 0x70, 0xf0,
@@ -71,11 +76,7 @@ const uint8_t BIT_REVERSE[256] = {
 
 static int spi_fd;
 static uint8_t vcom = 0;
-/* FIXME: remove hardcoded buffer length */
-static uint8_t buff[12482];
-
-#define PIN_SCS 24
-#define PIN_DISP 25
+static uint8_t buff[BUFF_SIZE];
 
 /* FIXME: initialize with screen width and height */
 int smemlcd_init() {
@@ -123,25 +124,16 @@ int smemlcd_write(uint8_t *data) {
         row = line * 52 + 1;
         buff[row] = BIT_REVERSE[line + 1];
         for (i = 0; i < 50; i++)
-            buff[row + i + 1] = ~data[line * 50 + i]; // pil
+            buff[row + i + 1] = ~data[line * 50 + i];
     }
 
     GPIO_SET(PIN_SCS);
     usleep(10);
-    /* cannot write whole buffer at once due to 4096 bytes limit */
-    /* FIXME: remove hardcodings */
-    r = write(spi_fd, buff, 3120);
-    if (r != 3120)
-        perror(NULL);
-    r = write(spi_fd, buff + 3120, 3120);
-    if (r != 3120)
-        perror(NULL);
-    r = write(spi_fd, buff + 3120 * 2, 3120);
-    if (r != 3120)
-        perror(NULL);
-    r = write(spi_fd, buff + 3120 * 3, 3122);
-    if (r != 3122)
-        perror(NULL);
+
+    r = write(spi_fd, buff, BUFF_SIZE);
+    if (r != BUFF_SIZE)
+        perror("SPI device error");
+
     usleep(5);
     GPIO_CLR(PIN_SCS);
 

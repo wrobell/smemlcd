@@ -26,6 +26,21 @@ scheme::
     SI                  GPIO 10 (MOSI)
     SCLK                GPIO 11 (SCLK)
 
+SPI Message Length
+==================
+SPI message length limit is 4096 bytes on Raspberry Pi by default. For 2.7"
+screen it has to be increased to 12482 bytes.
+
+Add the following parameter into /boot/cmdline.txt file if spidev module is
+built into kernel::
+
+    spidev.bufsiz=12482
+
+Otherwise, create /etc/modprobe.d/spidev.conf file with the following
+contents::
+
+    options spidev bufsiz=12482
+
 Using Library
 =============
 The library is very basic and does not provide any drawing primitives.
