@@ -32,8 +32,6 @@
 #define PAGE_SIZE (4 * 1024)
 #define BLOCK_SIZE (4 * 1024)
 
-static int mem_fd;
-static void *gpio_map;
 static volatile unsigned *gpio;
 
 /* GPIO setup macros. Always use GPIO_IN before using GPIO_OUT. */
@@ -44,6 +42,9 @@ static volatile unsigned *gpio;
 #define GPIO_CLR(pin) *(gpio + 10) = 1 << pin
 
 int gpio_init() {
+    int mem_fd;
+    void *gpio_map;
+
     if ((mem_fd = open("/dev/mem", O_RDWR | O_SYNC)) < 0) {
         fprintf(stderr, "Cannot open /dev/mem\n");
         return -1;
