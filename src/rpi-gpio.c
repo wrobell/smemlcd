@@ -32,7 +32,7 @@
 #define PAGE_SIZE (4 * 1024)
 #define BLOCK_SIZE (4 * 1024)
 
-static int  mem_fd;
+static int mem_fd;
 static void *gpio_map;
 static volatile unsigned *gpio;
 
