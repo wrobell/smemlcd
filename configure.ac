@@ -1,4 +1,4 @@
-AC_INIT(libsmemlcd, 0.1.0, wrobell@pld-linux.org)
+AC_INIT(smemlcd, 0.1.0, wrobell@pld-linux.org)
 
 AC_CONFIG_MACRO_DIR([m4])
 
