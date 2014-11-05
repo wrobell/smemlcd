@@ -98,6 +98,7 @@ int smemlcd_init() {
     gpio_init();
     GPIO_IN(PIN_SCS);
     GPIO_OUT(PIN_SCS);
+    usleep(50);
     GPIO_IN(PIN_DISP);
     GPIO_OUT(PIN_DISP);
 
