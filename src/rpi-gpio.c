@@ -28,8 +28,6 @@
 
 #define BCM2708_PERI_BASE 0x20000000
 #define GPIO_BASE (BCM2708_PERI_BASE + 0x200000) /* GPIO controller */
-
-#define PAGE_SIZE (4 * 1024)
 #define BLOCK_SIZE (4 * 1024)
 
 static volatile unsigned *gpio;
@@ -57,7 +55,7 @@ int gpio_init() {
     close(mem_fd);
 
     if (gpio_map == MAP_FAILED) {
-        fprintf(stderr, "mmap error %d\n", (int) gpio_map);
+        fprintf(stderr, "mmap error %d\n", gpio_map);
         return -1;
     }
 
