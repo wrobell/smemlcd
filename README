@@ -43,6 +43,25 @@ contents::
 
     options spidev bufsiz=12482
 
+Compiling Library
+=================
+The library build system uses GNU Autotools. To build the library one has
+to execute `configure` script followed by `make` command. The `BOARD`
+variable has to be passed to `configure` script to build the library for
+specific board, i.e.
+
+    $ ./configure BOARD=at91
+
+will build the library for Arietta G25 board.
+
+The list of boards and `BOARD` variable values is contained in the table
+below::
+
+    Board           `BOARD` value
+    -----------------------------
+    Raspberry Pi    rpi
+    Arietta G25     at91
+
 Using Library
 =============
 The library is very basic and does not provide any drawing primitives.

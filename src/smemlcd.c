@@ -24,7 +24,7 @@
 
 #include <linux/spi/spidev.h>
 
-#include "rpi-gpio.c"
+#include BOARD
 
 #ifdef SMEMLCD_DEBUG
 #include <stdio.h>

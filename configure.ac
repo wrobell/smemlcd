@@ -7,4 +7,6 @@ LT_INIT
 AC_PROG_CC
 AM_PROG_CC_C_O
 
+AC_ARG_VAR(BOARD, [specify board the library should be built for, i.e. rpi, at91])
+
 AC_OUTPUT(Makefile src/Makefile)
