@@ -35,7 +35,7 @@ def center(draw, y, txt, font):
     x = int((WIDTH - w) / 2)
     draw.text((x, y), txt, fill='white', font=font)
 
-#lcd = SMemLCD(args.device)
+lcd = SMemLCD(args.device)
 
 img = PIL.Image.new('1', (WIDTH, HEIGHT))
 draw = PIL.ImageDraw.Draw(img)
