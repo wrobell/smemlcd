@@ -7,34 +7,36 @@ Memory LCDs
 
 At the moment only 2.7" LCD screen (LS027B7DH01) is supported.
 
-The screen was tested with Raspberry Pi and Kuzyatech Sharp Memory LCD
-breakout A2
+The screen was tested with Raspberry Pi, Arietta G25 and Kuzyatech Sharp
+Memory LCD breakout A2
 
     https://www.tindie.com/products/kuzyatech/sharp-memory-lcd-breakout-a2/
 
 Connecting 2.7" LCD
 ===================
-The LCD should be connected to Raspberry Pi using the following connection
+The LCD should be connected to a board using the following connection
 scheme::
 
-    Breakout            Raspberry Pi
-    --------------------------------
-    VIN                 3V3 Power
-    GND                 Ground
-    DISP                GPIO 25
-    SCS                 GPIO 24
-    SI                  GPIO 10 (MOSI)
-    SCLK                GPIO 11 (SCLK)
+    Breakout    Raspberry Pi     Arietta G25
+    ---------------------------------------
+    VIN         3V3 Power        3V3 Power
+    GND         Ground           Ground
+    DISP        GPIO 25          PA25
+    SCS         GPIO 24          PA24
+    SI          GPIO 10 (MOSI)   PA22 (SPI1 MOSI)
+    SCLK        GPIO 11 (SCLK)   PA23 (SPI1 CK)
 
 SPI Message Length
 ==================
-SPI message length limit is 4096 bytes on Raspberry Pi by default. For 2.7"
-screen it has to be increased to 12482 bytes.
+SPI message length limit is 4096 bytes by default. For 2.7" screen it has
+to be increased to 12482 bytes.
 
-Add the following parameter into /boot/cmdline.txt file if spidev module is
-built into kernel::
+If spidev module is built into kernel, then parameter::
 
     spidev.bufsiz=12482
+
+should be added into /boot/cmdline.txt file (Raspberry Pi) or bootloader
+(i.e. Arietta G25).
 
 Otherwise, create /etc/modprobe.d/spidev.conf file with the following
 contents::
