@@ -40,7 +40,7 @@ lcd = SMemLCD(args.device)
 img = PIL.Image.new('1', (WIDTH, HEIGHT))
 draw = PIL.ImageDraw.Draw(img)
 if args.font:
-    font = PIL.ImageFont.truetype(args.font, size=30)
+    font = PIL.ImageFont.truetype(args.font[0], size=30)
 else:
     font = PIL.ImageFont.load_default()
 
