@@ -17,12 +17,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import argparse
 import time
 
 from smemlcd import SMemLCD
 import PIL.Image, PIL.ImageDraw, PIL.ImageFont
 
-FONT = '/usr/share/fonts/TTF/DejaVuSans-Bold.ttf'
+parser = argparse.ArgumentParser(description='smemlcd library example')
+parser.add_argument('-f', dest='font', nargs=1, help='TrueType font filename')
+parser.add_argument('device', help='SPI device filename, i.e. /dev/spi')
+args = parser.parse_args()
+
 WIDTH, HEIGHT = 400, 240
 
 def center(draw, y, txt, font):
@@ -30,11 +35,14 @@ def center(draw, y, txt, font):
     x = int((WIDTH - w) / 2)
     draw.text((x, y), txt, fill='white', font=font)
 
-lcd = SMemLCD()
+#lcd = SMemLCD(args.device)
 
 img = PIL.Image.new('1', (WIDTH, HEIGHT))
 draw = PIL.ImageDraw.Draw(img)
-font = PIL.ImageFont.truetype(FONT, size=30)
+if args.font:
+    font = PIL.ImageFont.truetype(args.font, size=30)
+else:
+    font = PIL.ImageFont.load_default()
 
 for i in range(60, -1, -1):
     img.paste(0)
