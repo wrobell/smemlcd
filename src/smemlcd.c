@@ -79,16 +79,14 @@ static uint8_t vcom = 0;
 static uint8_t buff[BUFF_SIZE];
 
 /* FIXME: initialize with screen width and height */
-int smemlcd_init() {
+int smemlcd_init(const char *f_dev) {
     int r;
     uint8_t mode = SPI_MODE_0;
     uint8_t bits_per_word = 8;
     uint8_t lsb = 0;
     uint32_t speed_hz = 6000000; /* experiment for software vcom; this
                                     value works with kuzyatech breakout */
-
-
-    spi_fd = open("/dev/spidev0.0", O_RDWR);
+    spi_fd = open(f_dev, O_RDWR);
     r = ioctl(spi_fd, SPI_IOC_WR_MODE, &mode);
     r = ioctl(spi_fd, SPI_IOC_WR_BITS_PER_WORD, &bits_per_word);
     r = ioctl(spi_fd, SPI_IOC_WR_LSB_FIRST, &lsb);

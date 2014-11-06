@@ -22,8 +22,10 @@
 
 /*!
  * Initialize LCD.
+ *
+ * \param f_dev SPI device filename, i.e. /dev/spi.
  */
-int smemlcd_init();
+int smemlcd_init(const char *f_dev);
 
 /*!
  * Clear LCD.

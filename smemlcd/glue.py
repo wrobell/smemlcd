@@ -27,12 +27,14 @@ class SMemLCD(object):
     """
     Sharp Memory LCDs display class.
     """
-    def __init__(self):
+    def __init__(self, f_dev):
         """
         Create Sharp Memory LCD display instance.
+
+        :param f_dev: SPI device filename, i.e. /dev/spi.
         """
         self._lib = ct.CDLL('libsmemlcd.so.0')
-        self._lib.smemlcd_init()
+        self._lib.smemlcd_init(f_dev.encode())
 
 
     def write(self, data):
