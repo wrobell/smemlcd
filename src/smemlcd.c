@@ -84,7 +84,7 @@ int smemlcd_init(const char *f_dev) {
     uint8_t mode = SPI_MODE_0;
     uint8_t bits_per_word = 8;
     uint8_t lsb = 0;
-    uint32_t speed_hz = 6000000; /* experiment for software vcom; this
+    uint32_t speed_hz = 4000000; /* experiment for software vcom; this
                                     value works with kuzyatech breakout */
     spi_fd = open(f_dev, O_RDWR);
     r = ioctl(spi_fd, SPI_IOC_WR_MODE, &mode);
