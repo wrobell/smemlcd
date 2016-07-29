@@ -1,0 +1,71 @@
+Introduction
+============
+The smemlcd library provides C library (with Python 3 bindings) for Sharp
+Memory LCDs
+
+    http://www.sharpmemorylcd.com/
+
+At the moment only 2.7" LCD screen (LS027B7DH01) is supported.
+
+The screen was tested with Raspberry Pi, Arietta G25 and Kuzyatech Sharp
+Memory LCD breakout A2
+
+    https://www.tindie.com/products/kuzyatech/sharp-memory-lcd-breakout-a2/
+
+Connecting 2.7" LCD
+===================
+The LCD should be connected to a board using the following connection
+scheme::
+
+    Breakout    Raspberry Pi     Arietta G25
+    ---------------------------------------
+    VIN         3V3 Power        3V3 Power
+    GND         Ground           Ground
+    DISP        GPIO 25          PA25
+    SCS         GPIO 24          PA24
+    SI          GPIO 10 (MOSI)   PA22 (SPI1 MOSI)
+    SCLK        GPIO 11 (SCLK)   PA23 (SPI1 CK)
+
+SPI Message Length
+==================
+SPI message length limit is 4096 bytes by default. For 2.7" screen it has
+to be increased to 12482 bytes.
+
+If spidev module is built into kernel, then parameter::
+
+    spidev.bufsiz=12482
+
+should be added into /boot/cmdline.txt file (Raspberry Pi) or bootloader
+(i.e. Arietta G25).
+
+Otherwise, create /etc/modprobe.d/spidev.conf file with the following
+contents::
+
+    options spidev bufsiz=12482
+
+Compiling Library
+=================
+The library build system uses GNU Autotools. To build the library one has
+to execute `configure` script followed by `make` command. The `BOARD`
+variable has to be passed to `configure` script to build the library for
+specific board, i.e.
+
+    $ ./configure BOARD=at91
+
+will build the library for Arietta G25 board.
+
+The list of boards and `BOARD` variable values is contained in the table
+below::
+
+    Board           `BOARD` value
+    -----------------------------
+    Raspberry Pi    rpi
+    Arietta G25     at91
+
+Using Library
+=============
+The library is very basic and does not provide any drawing primitives.
+Additional library like PIL or Cairo should be used to create framebuffer,
+draw in the framebuffer and finally send the framebuffer to the LCD.
+
+See `examples` directory for various examples.
