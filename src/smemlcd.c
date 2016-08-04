@@ -17,10 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <aio.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <stdint.h>
 #include <string.h>
+#include <sys/signalfd.h>
 #include <sys/ioctl.h>
+#include <sys/time.h>
 
 #include <linux/spi/spidev.h>
 
@@ -77,6 +81,7 @@ const uint8_t BIT_REVERSE[256] = {
 static int spi_fd;
 static uint8_t vcom = 0;
 static uint8_t buff[BUFF_SIZE];
+struct aiocb aio_data;
 
 /* FIXME: initialize with screen width and height */
 int smemlcd_init(const char *f_dev) {
@@ -105,7 +110,8 @@ int smemlcd_init(const char *f_dev) {
     usleep(50);
     GPIO_SET(PIN_DISP);
     usleep(50);
-
+    
+    return 0;
 }
 
 int smemlcd_write(uint8_t *data) {
@@ -139,6 +145,49 @@ int smemlcd_write(uint8_t *data) {
     return 0;
 }
 
+int smemlcd_write_async(uint8_t *data) {
+    int i, r;
+    int line;
+    int row;
+
+
+    /*
+     * FIXME: remove all width/height/"buffer length" related hardcodings
+     */
+
+    vcom ^= 0b01000000;
+    buff[0] = 0x80 | vcom;
+    for (line = 0; line < 240; line++) {
+        row = line * 52 + 1;
+        buff[row] = BIT_REVERSE[line + 1];
+        for (i = 0; i < 50; i++)
+            buff[row + i + 1] = ~data[line * 50 + i];
+    }
+
+
+    /* initialize asynchronous call */
+    bzero(&aio_data, sizeof(struct aiocb));
+    aio_data.aio_fildes = spi_fd;
+    aio_data.aio_buf = buff;
+    aio_data.aio_nbytes = BUFF_SIZE;
+    aio_data.aio_sigevent.sigev_notify = SIGEV_SIGNAL;
+    aio_data.aio_sigevent.sigev_signo = SIGUSR1;
+    aio_data.aio_sigevent.sigev_value.sival_int = 1;
+
+    GPIO_SET(PIN_SCS);
+    usleep(10);
+    r = aio_write(&aio_data);
+
+    return r;
+}
+
+int smemlcd_write_async_end() {
+    usleep(5);
+    GPIO_CLR(PIN_SCS);
+
+    return 0;
+}
+
 
 int smemlcd_clear() {
     int r;
@@ -154,6 +203,10 @@ int smemlcd_clear() {
     GPIO_CLR(PIN_SCS);
 
     return 0;
+}
+
+int smemlcd_close() {
+    return close(spi_fd);
 }
 
 /*

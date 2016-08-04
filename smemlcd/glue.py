@@ -21,6 +21,7 @@
 Sharp Memory LCDs library.
 """
 
+import asyncio
 import signal
 
 from _smemlcd import ffi, lib
@@ -29,24 +30,52 @@ class SMemLCD(object):
     """
     Sharp Memory LCDs display class.
     """
-    def __init__(self, f_dev):
+    def __init__(self, f_dev, loop=None):
         """
         Create Sharp Memory LCD display instance.
 
         :param f_dev: SPI device filename, i.e. /dev/spi.
+        :param loop: Asyncio loop instance.
         """
         lib.smemlcd_init(f_dev.encode())
+        if loop:
+            loop.add_signal_handler(signal.SIGUSR1, self._write_async_end)
+        self._loop = loop
+        self._future = None
 
 
     def write(self, data):
         """
-        Write data to Sharp memory LCD.
+        Write data to Sharp Memory LCD.
 
         :param data: Screen data to display.
         """
         n = len(data)
         assert n == 12000
         lib.smemlcd_write(data)
+
+
+    async def write_async(self, data):
+        """
+        Write data to Sharp Memory LCD in asynchronous manner.
+
+        :param data: Screen data to display.
+        """
+        n = len(data)
+        assert n == 12000
+
+        self._future = asyncio.Future(loop=self._loop)
+        lib.smemlcd_write_async(data)
+        await self._future
+
+
+    def _write_async_end(self):
+        """
+        Finish asynchronous write call to Sharp Memory LCD.
+        """
+        lib.smemlcd_write_async_end()
+        self._future.set_result(None)
+        self._future = None
 
 
 # vim: sw=4:et:ai

@@ -20,7 +20,10 @@ ffi = cffi.FFI()
 ffi.cdef("""
 int smemlcd_init(const char *);
 int smemlcd_write(uint8_t *);
+int smemlcd_write_async(uint8_t *);
+int smemlcd_write_async_end(void);
 int smemlcd_clear(void);
+int smemlcd_close(void);
 """)
 
 ffi.set_source('_smemlcd', """
@@ -28,3 +31,4 @@ ffi.set_source('_smemlcd', """
 """, libraries=['smemlcd'], library_dirs=['src/.libs'], include_dirs=['src'])
 
 # vim: sw=4:et:ai
+
