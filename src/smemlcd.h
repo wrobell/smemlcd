@@ -30,7 +30,7 @@ int smemlcd_init(const char *f_dev);
 /*!
  * Clear LCD.
  */
-int smemlcd_clear();
+int smemlcd_clear(void);
 
 /*!
  * Write screen data to LCD.

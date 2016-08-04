@@ -21,7 +21,9 @@
 Sharp Memory LCDs library.
 """
 
-import ctypes as ct
+import signal
+
+from _smemlcd import ffi, lib
 
 class SMemLCD(object):
     """
@@ -33,8 +35,7 @@ class SMemLCD(object):
 
         :param f_dev: SPI device filename, i.e. /dev/spi.
         """
-        self._lib = ct.CDLL('libsmemlcd.so.0')
-        self._lib.smemlcd_init(f_dev.encode())
+        lib.smemlcd_init(f_dev.encode())
 
 
     def write(self, data):
@@ -45,9 +46,7 @@ class SMemLCD(object):
         """
         n = len(data)
         assert n == 12000
-
-        buff = (ct.c_ubyte * n).from_buffer_copy(data)
-        self._lib.smemlcd_write(buff)
+        lib.smemlcd_write(data)
 
 
 # vim: sw=4:et:ai
