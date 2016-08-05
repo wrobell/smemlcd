@@ -43,7 +43,6 @@ class SMemLCD(object):
         self._loop = loop
         self._future = None
 
-
     def write(self, data):
         """
         Write data to Sharp Memory LCD.
@@ -53,7 +52,6 @@ class SMemLCD(object):
         n = len(data)
         assert n == 12000
         lib.smemlcd_write(data)
-
 
     async def write_async(self, data):
         """
@@ -68,7 +66,6 @@ class SMemLCD(object):
         lib.smemlcd_write_async(data)
         await self._future
 
-
     def _write_async_end(self):
         """
         Finish asynchronous write call to Sharp Memory LCD.
@@ -76,6 +73,11 @@ class SMemLCD(object):
         lib.smemlcd_write_async_end()
         self._future.set_result(None)
         self._future = None
+
+    def close(self):
+        if self._loop:
+            self._loop.remove_signal_handler(signal.SIGUSR1)
+        lib.smemlcd_close()
 
 
 # vim: sw=4:et:ai
