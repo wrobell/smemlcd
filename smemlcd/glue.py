@@ -62,6 +62,9 @@ class SMemLCD(object):
         n = len(data)
         assert n == 12000
 
+        if self._future:
+            raise SMemLCDError('Asynchronous call in progress')
+
         self._future = asyncio.Future(loop=self._loop)
         lib.smemlcd_write_async(data)
         await self._future
@@ -78,9 +81,17 @@ class SMemLCD(object):
         """
         Release resources hold by Sharp Memory LCD.
         """
+        lib.smemlcd_close()
         if self._loop:
             self._loop.remove_signal_handler(signal.SIGUSR1)
-        lib.smemlcd_close()
+
+
+class SMemLCDError(Exception):
+    """
+    Raised when accessing Sharp Memory LCD fails.
+
+    At the moment raised only when asynchronous call is in progress.
+    """
 
 
 # vim: sw=4:et:ai
