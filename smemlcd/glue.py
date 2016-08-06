@@ -75,6 +75,9 @@ class SMemLCD(object):
         self._future = None
 
     def close(self):
+        """
+        Release resources hold by Sharp Memory LCD.
+        """
         if self._loop:
             self._loop.remove_signal_handler(signal.SIGUSR1)
         lib.smemlcd_close()
