@@ -65,7 +65,7 @@ class SMemLCD(object):
         if self._future:
             raise SMemLCDError('Asynchronous call in progress')
 
-        self._future = asyncio.Future(loop=self._loop)
+        self._future = self._loop.create_future()
         lib.smemlcd_write_async(data)
         await self._future
 
