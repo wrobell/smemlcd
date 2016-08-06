@@ -25,6 +25,10 @@ from smemlcd import SMemLCD
 import PIL.Image, PIL.ImageDraw, PIL.ImageFont
 
 parser = argparse.ArgumentParser(description='smemlcd library asyncio example')
+parser.add_argument(
+    '-p', dest='policy', choices=('default', 'uv'), nargs=1,
+    help='TrueType font filename'
+)
 parser.add_argument('-f', dest='font', nargs=1, help='TrueType font filename')
 parser.add_argument('device', help='SPI device filename, i.e. /dev/spi')
 args = parser.parse_args()
@@ -35,6 +39,10 @@ def center(draw, y, txt, font):
     w, h = draw.textsize(txt, font=font)
     x = int((WIDTH - w) / 2)
     draw.text((x, y), txt, fill='white', font=font)
+
+if args.policy == 'uv':
+    import uvloop
+    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 img = PIL.Image.new('1', (WIDTH, HEIGHT))
 draw = PIL.ImageDraw.Draw(img)
