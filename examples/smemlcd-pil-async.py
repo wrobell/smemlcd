@@ -65,6 +65,10 @@ async def run(lcd):
 loop = asyncio.get_event_loop()
 
 lcd = SMemLCD(args.device, loop=loop)
-loop.run_until_complete(run(lcd))
+try:
+    loop.run_until_complete(run(lcd))
+finally:
+    loop.close()
+    lcd.close()
 
 # vim: sw=4:et:ai

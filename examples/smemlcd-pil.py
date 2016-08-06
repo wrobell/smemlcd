@@ -61,4 +61,6 @@ for i in range(60, -1, -1):
 
     time.sleep(1)
 
+lcd.close()
+
 # vim: sw=4:et:ai
