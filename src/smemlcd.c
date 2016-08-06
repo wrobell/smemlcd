@@ -18,6 +18,7 @@
  */
 
 #include <aio.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <stdint.h>
@@ -206,6 +207,8 @@ int smemlcd_clear() {
 }
 
 int smemlcd_close() {
+    if (aio_error(&aio_data) == EINPROGRESS)
+        aio_cancel(spi_fd, &aio_data);
     return close(spi_fd);
 }
 
