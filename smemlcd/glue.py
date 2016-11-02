@@ -90,6 +90,8 @@ class SMemLCD(object):
         lib.smemlcd_close()
         if self._loop:
             self._loop.remove_signal_handler(signal.SIGUSR1)
+        if self._future and not self._future.done():
+            self._future.set_exception(asyncio.CancelledError('Display closed'))
 
 
 class SMemLCDError(Exception):
