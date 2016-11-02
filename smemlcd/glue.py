@@ -58,7 +58,9 @@ class SMemLCD(object):
 
         :param data: Screen buffer data.
         """
-        lib.smemlcd_write(ffi.from_buffer(data), self.width, self.reversed)
+        r = lib.smemlcd_write(ffi.from_buffer(data), self.width, self.reversed)
+        if r != 0:
+            raise SMemLCDError('Write error')
 
     async def write_async(self, data):
         """
@@ -72,16 +74,21 @@ class SMemLCD(object):
             raise SMemLCDError('Asynchronous call in progress')
 
         self._future = self._loop.create_future()
-        lib.smemlcd_write_async(ffi.from_buffer(data), self.width, self.reversed)
+        r = lib.smemlcd_write_async(ffi.from_buffer(data), self.width, self.reversed)
+        if r != 0:
+            raise SMemLCDError('Asynchronous write cannot be started')
         await self._future
 
     def _write_async_end(self):
         """
         Finish asynchronous write call to Sharp Memory LCD.
         """
-        lib.smemlcd_write_async_end()
-        self._future.set_result(None)
-        self._future = None
+        r = lib.smemlcd_write_async_end()
+        if r == 0:
+            self._future.set_result(None)
+            self._future = None
+        else:
+            self._future.set_exception(SMemLCDError('Asynchronous write error'))
 
     def close(self):
         """

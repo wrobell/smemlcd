@@ -181,8 +181,10 @@ int smemlcd_write(uint8_t *data, uint8_t width, uint8_t reversed) {
     usleep(10);
 
     r = write(spi_fd, buff, BUFF_SIZE);
-    if (r != BUFF_SIZE)
+    if (r != BUFF_SIZE) {
         perror("SPI device error");
+        return -1;
+    }
 
     usleep(5);
     GPIO_CLR(PIN_SCS);
@@ -212,6 +214,13 @@ int smemlcd_write_async(uint8_t *data, uint8_t width, uint8_t reversed) {
 }
 
 int smemlcd_write_async_end() {
+    if (aio_error(&aio_data)) {
+        perror("Async write error");
+        return -1;
+    }
+    if (aio_return(&aio_data) != BUFF_SIZE)
+        return -1;
+
     usleep(5);
     GPIO_CLR(PIN_SCS);
 
