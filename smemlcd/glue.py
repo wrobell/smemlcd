@@ -29,6 +29,12 @@ from _smemlcd import ffi, lib
 class SMemLCD(object):
     """
     Sharp Memory LCDs display class.
+
+    Use `width` equal to 52 and reversed set to true for Cairo. Use
+    `width` equal to 50 and reversed set to false for PIL.
+
+    :var width: Width of buffer line in bytes.
+    :var reversed: Reverse order of buffer byte.
     """
     def __init__(self, f_dev, loop=None):
         """
@@ -43,30 +49,30 @@ class SMemLCD(object):
         self._loop = loop
         self._future = None
 
+        self.width = 52
+        self.reversed = True
+
     def write(self, data):
         """
         Write data to Sharp Memory LCD.
 
-        :param data: Screen data to display.
+        :param data: Screen buffer data.
         """
-        n = len(data)
-        assert n == 12000
-        lib.smemlcd_write(data)
+        lib.smemlcd_write(ffi.from_buffer(data), self.width, self.reversed)
 
     async def write_async(self, data):
         """
-        Write data to Sharp Memory LCD in asynchronous manner.
+        Write data to Sharp Memory LCD.
 
-        :param data: Screen data to display.
+        The method is a coroutine.
+
+        :param data: Screen buffer data.
         """
-        n = len(data)
-        assert n == 12000
-
         if self._future:
             raise SMemLCDError('Asynchronous call in progress')
 
         self._future = self._loop.create_future()
-        lib.smemlcd_write_async(data)
+        lib.smemlcd_write_async(ffi.from_buffer(data), self.width, self.reversed)
         await self._future
 
     def _write_async_end(self):

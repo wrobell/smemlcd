@@ -35,14 +35,14 @@ int smemlcd_clear(void);
 /*!
  * Write data to LCD screen.
  */
-int smemlcd_write(uint8_t *data);
+int smemlcd_write(uint8_t*, uint8_t, uint8_t);
 
 /*!
  * Write data to LCD screen in asynchronous way.
- * 
+ *
  * Use `smemlcd_write_async_end` to finish the call.
  */
-int smemlcd_write_async(uint8_t *data);
+int smemlcd_write_async(uint8_t *data, uint8_t, uint8_t);
 
 /*!
  * Finish asynchronous write to LCD screen.
