@@ -48,7 +48,7 @@ if args.policy == 'uv':
 
 img_data = bytearray(12480)
 surface = cairo.ImageSurface.create_for_data(
-    img_data, cairo.FORMAT_A1, 416, 240
+    img_data, cairo.FORMAT_A1, 400, 240
 )
 cr = cairo.Context(surface)
 
