@@ -30,10 +30,15 @@ class SMemLCD(object):
     """
     Sharp Memory LCDs display class.
 
-    Use `width` equal to 52 and reversed set to true for Cairo. Use
-    `width` equal to 50 and reversed set to false for PIL.
+    The screen object can be configured for different graphics libraries
 
-    :var width: Width of buffer line in bytes.
+    cairo
+        Supported by default with `A1` format. Use `stride` equal to `52
+        and set `reversed` attribute to true.
+    PIL
+        Use `stride` equal to `50 and set `reversed` attribute to false.
+
+    :var stride: The length of a row in bytes.
     :var reversed: Reverse order of buffer byte.
     """
     def __init__(self, f_dev, loop=None):
@@ -49,7 +54,7 @@ class SMemLCD(object):
         self._loop = loop
         self._future = None
 
-        self.width = 52
+        self.stride = 52
         self.reversed = True
 
     def write(self, data):
@@ -58,7 +63,7 @@ class SMemLCD(object):
 
         :param data: Screen buffer data.
         """
-        r = lib.smemlcd_write(ffi.from_buffer(data), self.width, self.reversed)
+        r = lib.smemlcd_write(ffi.from_buffer(data), self.stride, self.reversed)
         if r != 0:
             raise SMemLCDError('Write error')
 
@@ -74,7 +79,7 @@ class SMemLCD(object):
             raise SMemLCDError('Asynchronous call in progress')
 
         self._future = self._loop.create_future()
-        r = lib.smemlcd_write_async(ffi.from_buffer(data), self.width, self.reversed)
+        r = lib.smemlcd_write_async(ffi.from_buffer(data), self.stride, self.reversed)
         if r != 0:
             raise SMemLCDError('Asynchronous write cannot be started')
         await self._future

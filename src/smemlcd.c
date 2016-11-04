@@ -121,10 +121,10 @@ struct aiocb aio_data;
 
 /*
  * - data: screen data
- * - width: how many bytes per line? 50 - pil, 52 - cairo
+ * - stride: number of bytes per row: 50 - pil, 52 - cairo
  * - reversed: reverse byte data? 0 - pil, 1 - cairo
  */
-static inline void lcd_write(uint8_t *data, uint8_t width, uint8_t reversed) {
+static inline void lcd_write(uint8_t *data, uint8_t stride, uint8_t reversed) {
     /*
      * FIXME: remove all width/height/"buffer length" related hardcodings
      */
@@ -137,7 +137,7 @@ static inline void lcd_write(uint8_t *data, uint8_t width, uint8_t reversed) {
         row = line * 52 + 1;
         buff[row] = BIT_REVERSE[line + 1];
         for (i = 0; i < 50; i++)
-            buff[row + i + 1] = ~bit_order[data[line * width + i]];
+            buff[row + i + 1] = ~bit_order[data[line * stride + i]];
     }
 
 }
@@ -173,10 +173,10 @@ int smemlcd_init(const char *f_dev) {
     return 0;
 }
 
-int smemlcd_write(uint8_t *data, uint8_t width, uint8_t reversed) {
+int smemlcd_write(uint8_t *data, uint8_t stride, uint8_t reversed) {
     int r;
 
-    lcd_write(data, width, reversed);
+    lcd_write(data, stride, reversed);
     GPIO_SET(PIN_SCS);
     usleep(10);
 
@@ -192,10 +192,10 @@ int smemlcd_write(uint8_t *data, uint8_t width, uint8_t reversed) {
     return 0;
 }
 
-int smemlcd_write_async(uint8_t *data, uint8_t width, uint8_t reversed) {
+int smemlcd_write_async(uint8_t *data, uint8_t stride, uint8_t reversed) {
     int r;
 
-    lcd_write(data, width, reversed);
+    lcd_write(data, stride, reversed);
 
     /* initialize asynchronous call */
     bzero(&aio_data, sizeof(struct aiocb));
