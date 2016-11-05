@@ -52,7 +52,7 @@ class SMemLCD(object):
         if loop:
             loop.add_signal_handler(signal.SIGUSR1, self._write_async_end)
         self._loop = loop
-        self._future = None
+        self._task = None
 
         self.stride = 52
         self.reversed = True
@@ -75,25 +75,14 @@ class SMemLCD(object):
 
         :param data: Screen buffer data.
         """
-        if self._future:
+        if self._task:
             raise SMemLCDError('Asynchronous call in progress')
 
-        self._future = self._loop.create_future()
+        self._task = self._loop.create_future()
         r = lib.smemlcd_write_async(ffi.from_buffer(data), self.stride, self.reversed)
         if r != 0:
             raise SMemLCDError('Asynchronous write cannot be started')
-        await self._future
-
-    def _write_async_end(self):
-        """
-        Finish asynchronous write call to Sharp Memory LCD.
-        """
-        r = lib.smemlcd_write_async_end()
-        if r == 0:
-            self._future.set_result(None)
-            self._future = None
-        else:
-            self._future.set_exception(SMemLCDError('Asynchronous write error'))
+        await self._task
 
     def close(self):
         """
@@ -102,8 +91,19 @@ class SMemLCD(object):
         lib.smemlcd_close()
         if self._loop:
             self._loop.remove_signal_handler(signal.SIGUSR1)
-        if self._future and not self._future.done():
-            self._future.set_exception(asyncio.CancelledError('Display closed'))
+        if self._task and not self._task.done():
+            self._task.set_exception(asyncio.CancelledError('Display closed'))
+
+    def _write_async_end(self):
+        """
+        Finish asynchronous write call to Sharp Memory LCD.
+        """
+        r = lib.smemlcd_write_async_end()
+        if r == 0:
+            self._task.set_result(None)
+            self._task = None
+        else:
+            self._task.set_exception(SMemLCDError('Asynchronous write error'))
 
 
 class SMemLCDError(Exception):
