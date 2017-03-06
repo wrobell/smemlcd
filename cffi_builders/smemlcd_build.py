@@ -18,9 +18,9 @@ import cffi
 
 ffi = cffi.FFI()
 ffi.cdef("""
-int smemlcd_init(const char *);
-int smemlcd_write(uint8_t *);
-int smemlcd_write_async(uint8_t *);
+int smemlcd_init(const char*);
+int smemlcd_write(uint8_t*, uint8_t, uint8_t);
+int smemlcd_write_async(uint8_t*, uint8_t, uint8_t);
 int smemlcd_write_async_end(void);
 int smemlcd_clear(void);
 int smemlcd_close(void);

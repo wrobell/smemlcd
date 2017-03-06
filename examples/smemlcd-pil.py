@@ -36,6 +36,8 @@ def center(draw, y, txt, font):
     draw.text((x, y), txt, fill='white', font=font)
 
 lcd = SMemLCD(args.device)
+lcd.width = 50
+lcd.reversed = False
 
 img = PIL.Image.new('1', (WIDTH, HEIGHT))
 draw = PIL.ImageDraw.Draw(img)
@@ -45,6 +47,7 @@ else:
     font = PIL.ImageFont.load_default()
 
 for i in range(60, -1, -1):
+    start = time.monotonic()
     img.paste(0)
 
     center(draw, 60, 'smemlcd library demo', font)
@@ -52,14 +55,15 @@ for i in range(60, -1, -1):
     s = 'closing in {:02d}...'.format(i)
     center(draw, 100, s, font)
 
-    draw.arc(((180, 180), (220, 220)), 0, 360, fill='white')
-    draw.pieslice(((180, 180), (220, 220)), -90, (60 - i) * 6 - 90, outline='white')
+    draw.rectangle((5, 120, 395, 140), outline='white')
+    draw.rectangle((6, 121, 6 + 393 * (60 - i) / 60, 139), outline='white', fill='white')
 
-    t1 = time.time()
+    sw = time.monotonic()
     lcd.write(img.tobytes())
-    print('lcd writing time', round(time.time() - t1, 4))
+    end = time.monotonic()
+    print('time: process={:.4f}, write={:.4f}'.format(end - start, end - sw))
 
-    time.sleep(1)
+    time.sleep(0.2)
 
 lcd.close()
 
