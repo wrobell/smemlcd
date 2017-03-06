@@ -21,33 +21,77 @@
 Sharp Memory LCDs library.
 """
 
-import ctypes as ct
+import asyncio
+import signal
+
+from _smemlcd import ffi, lib
 
 class SMemLCD(object):
     """
     Sharp Memory LCDs display class.
     """
-    def __init__(self, f_dev):
+    def __init__(self, f_dev, loop=None):
         """
         Create Sharp Memory LCD display instance.
 
         :param f_dev: SPI device filename, i.e. /dev/spi.
+        :param loop: Asyncio loop instance.
         """
-        self._lib = ct.CDLL('libsmemlcd.so.0')
-        self._lib.smemlcd_init(f_dev.encode())
-
+        lib.smemlcd_init(f_dev.encode())
+        if loop:
+            loop.add_signal_handler(signal.SIGUSR1, self._write_async_end)
+        self._loop = loop
+        self._future = None
 
     def write(self, data):
         """
-        Write data to Sharp memory LCD.
+        Write data to Sharp Memory LCD.
+
+        :param data: Screen data to display.
+        """
+        n = len(data)
+        assert n == 12000
+        lib.smemlcd_write(data)
+
+    async def write_async(self, data):
+        """
+        Write data to Sharp Memory LCD in asynchronous manner.
 
         :param data: Screen data to display.
         """
         n = len(data)
         assert n == 12000
 
-        buff = (ct.c_ubyte * n).from_buffer_copy(data)
-        self._lib.smemlcd_write(buff)
+        if self._future:
+            raise SMemLCDError('Asynchronous call in progress')
+
+        self._future = self._loop.create_future()
+        lib.smemlcd_write_async(data)
+        await self._future
+
+    def _write_async_end(self):
+        """
+        Finish asynchronous write call to Sharp Memory LCD.
+        """
+        lib.smemlcd_write_async_end()
+        self._future.set_result(None)
+        self._future = None
+
+    def close(self):
+        """
+        Release resources hold by Sharp Memory LCD.
+        """
+        lib.smemlcd_close()
+        if self._loop:
+            self._loop.remove_signal_handler(signal.SIGUSR1)
+
+
+class SMemLCDError(Exception):
+    """
+    Raised when accessing Sharp Memory LCD fails.
+
+    At the moment raised only when asynchronous call is in progress.
+    """
 
 
 # vim: sw=4:et:ai

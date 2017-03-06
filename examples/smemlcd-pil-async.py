@@ -18,12 +18,17 @@
 #
 
 import argparse
+import asyncio
 import time
 
 from smemlcd import SMemLCD
 import PIL.Image, PIL.ImageDraw, PIL.ImageFont
 
-parser = argparse.ArgumentParser(description='smemlcd library example')
+parser = argparse.ArgumentParser(description='smemlcd library asyncio example')
+parser.add_argument(
+    '-p', dest='policy', choices=('default', 'uv'), nargs=1,
+    help='TrueType font filename'
+)
 parser.add_argument('-f', dest='font', nargs=1, help='TrueType font filename')
 parser.add_argument('device', help='SPI device filename, i.e. /dev/spi')
 args = parser.parse_args()
@@ -35,7 +40,9 @@ def center(draw, y, txt, font):
     x = int((WIDTH - w) / 2)
     draw.text((x, y), txt, fill='white', font=font)
 
-lcd = SMemLCD(args.device)
+if args.policy == 'uv':
+    import uvloop
+    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 img = PIL.Image.new('1', (WIDTH, HEIGHT))
 draw = PIL.ImageDraw.Draw(img)
@@ -44,23 +51,32 @@ if args.font:
 else:
     font = PIL.ImageFont.load_default()
 
-for i in range(60, -1, -1):
-    img.paste(0)
+async def run(lcd):
+    for i in range(60, -1, -1):
+        img.paste(0)
 
-    center(draw, 60, 'smemlcd library demo', font)
+        center(draw, 60, 'smemlcd library demo', font)
 
-    s = 'closing in {:02d}...'.format(i)
-    center(draw, 100, s, font)
+        s = 'closing in {:02d}...'.format(i)
+        center(draw, 100, s, font)
 
-    draw.arc(((180, 180), (220, 220)), 0, 360, fill='white')
-    draw.pieslice(((180, 180), (220, 220)), -90, (60 - i) * 6 - 90, outline='white')
+        draw.arc(((180, 180), (220, 220)), 0, 360, fill='white')
+        draw.pieslice(((180, 180), (220, 220)), -90, (60 - i) * 6 - 90, outline='white')
 
-    t1 = time.time()
-    lcd.write(img.tobytes())
-    print('lcd writing time', round(time.time() - t1, 4))
+        t1 = time.time()
+        await lcd.write_async(img.tobytes())
+        print('lcd writing time', round(time.time() - t1, 4))
 
-    time.sleep(1)
+        await asyncio.sleep(1)
 
-lcd.close()
+
+loop = asyncio.get_event_loop()
+
+lcd = SMemLCD(args.device, loop=loop)
+try:
+    loop.run_until_complete(run(lcd))
+finally:
+    loop.close()
+    lcd.close()
 
 # vim: sw=4:et:ai

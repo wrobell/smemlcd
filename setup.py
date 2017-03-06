@@ -23,6 +23,9 @@ from setuptools import setup, find_packages
 setup(
     name='smemlcd',
     packages=find_packages('.'),
+    setup_requires=['cffi >= 1.4.2'],
+    cffi_modules=['cffi_builders/smemlcd_build.py:ffi'],
+    install_requires=['cffi >= 1.4.2'],
     version='0.1.0',
     description='smemlcd - Sharp Memory LCDs library',
     author='Artur Wroblewski',

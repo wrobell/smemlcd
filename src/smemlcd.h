@@ -21,21 +21,38 @@
 #define _SMEMLCD_H_
 
 /*!
- * Initialize LCD.
+ * Initialize LCD screen.
  *
  * \param f_dev SPI device filename, i.e. /dev/spi.
  */
 int smemlcd_init(const char *f_dev);
 
 /*!
- * Clear LCD.
+ * Clear LCD screen.
  */
-int smemlcd_clear();
+int smemlcd_clear(void);
 
 /*!
- * Write screen data to LCD.
+ * Write data to LCD screen.
  */
 int smemlcd_write(uint8_t *data);
+
+/*!
+ * Write data to LCD screen in asynchronous way.
+ * 
+ * Use `smemlcd_write_async_end` to finish the call.
+ */
+int smemlcd_write_async(uint8_t *data);
+
+/*!
+ * Finish asynchronous write to LCD screen.
+ */
+int smemlcd_write_async_end(void);
+
+/*!
+ * Close open resources claimed by LCD screen.
+ */
+int smemlcd_close(void);
 
 #endif /* _SMEMLCD_H_ */
 
