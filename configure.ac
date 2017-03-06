@@ -1,4 +1,4 @@
-AC_INIT(smemlcd, 0.1.1, wrobell@pld-linux.org)
+AC_INIT(smemlcd, 0.1.1, wrobell@riseup.net)
 
 AC_CONFIG_MACRO_DIR([m4])
 

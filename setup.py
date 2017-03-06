@@ -2,7 +2,7 @@
 #
 # smemlcd - Sharp Memory LCDs library
 #
-# Copyright (C) 2014 by Artur Wroblewski <wrobell@pld-linux.org>
+# Copyright (C) 2014-2017 by Artur Wroblewski <wrobell@riseup.net>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ setup(
     version='0.1.0',
     description='smemlcd - Sharp Memory LCDs library',
     author='Artur Wroblewski',
-    author_email='wrobell@pld-linux.org',
+    author_email='wrobell@riseup.net',
     url='https://github.com/wrobell/smemlcd',
     classifiers=[
         'Topic :: Software Development :: Libraries',
