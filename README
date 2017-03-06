@@ -66,6 +66,6 @@ Using Library
 =============
 The library is very basic and does not provide any drawing primitives.
 Additional library like PIL or Cairo should be used to create framebuffer,
-draw in the framebuffer and finally send the framebuffer to the LCD.
+draw in the framebuffer and finally send the framebuffer to a LCD screen.
 
 See `examples` directory for various examples.
